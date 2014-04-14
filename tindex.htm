@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+	#body {
+		max-width: 1300px;
+		margin: auto;
+	}
+	.map-list {
+	}
+	.map-list-item {
+		display: inline-block;
+		margin: 10px; padding: 0;
+		width: 148px; height :148px;
+	}
+	.map-list-item img {
+		border: 10px solid hsla(0, 0%, 60%, 0.4);
+		background: white url('images/dev_measuregeneric01.png') center/128px 128px repeat scroll padding-box;
+	}
+	</style>
+	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript">
+
+		function mapListItem(repo) {
+			console.log(repo);
+			// Top level container
+			// Build dom tree and return new map item for appending.
+			var dom = document.createElement('div');
+			dom.className = 'map-list-item';
+				var module = document.createElement('div');
+				module.className = 'module';
+				dom.appendChild(module);
+
+					var moduleImg = document.createElement('div');
+					moduleImg.className = 'module-img';
+					module.appendChild(moduleImg);
+
+						var anchor = document.createElement('a');
+						anchor.href = repo.html_url + '/releases'
+						moduleImg.appendChild(anchor);
+
+							var img = document.createElement('img');
+							img.setAttribute('onerror', 'this.src ="";this.setAttribute("title", "Thumbnail Missing")');
+							img.src = "https://raw.githubusercontent.com/trouble-in-terrorist-town/{name}/master/src/{name}/maps/thumbs/{name}.png".replace(/\{name\}/g, repo.name);
+							img.title = repo.name.replace(/[_-]|\s+/g, ' ');
+							img.style.width = '128px';
+							img.style.height = '128px';
+							anchor.appendChild(img);
+
+
+			return dom;
+		}
+
+		// Make Github API request
+		repos = $.ajax('https://api.github.com/users/trouble-in-terrorist-town/repos').done(function(){
+			for(repo in repos.responseJSON) {
+				// Clean up our variables
+				var repo = repos.responseJSON[repo]
+				if (0 !== repo.name.indexOf('ttt')) {
+					// Skip Repos not marked as ttt maps.
+					continue
+				}
+				// Build new page tile from github repo object.
+				document.querySelector('.map-list').appendChild(
+					mapListItem(repo)
+				);
+			}
+		});
+	</script>
+</head>
+<body><div id="body">
+	<div class="map-list" class="content"></div>
+</div></body>
+</html>
